@@ -6,7 +6,10 @@ import {
   Run,
   Task,
 } from '@sorry-cypress/common';
-import { INACTIVITY_TIMEOUT_SECONDS } from '@sorry-cypress/director/config';
+import {
+  GITLAB_JOB_RETRIES,
+  INACTIVITY_TIMEOUT_SECONDS,
+} from '@sorry-cypress/director/config';
 import { getRunCiBuildId } from '@sorry-cypress/director/lib/ciBuildId';
 import {
   AppError,
@@ -28,17 +31,21 @@ import { curry, property, uniq } from 'lodash';
 import {
   enhanceSpec,
   getClaimedSpecs,
+  getFailedSpecs,
   getFirstUnclaimedSpec,
   getNewSpecsInGroup,
+  getRemoteOrigin,
   getSpecsForGroup,
 } from '../../utils';
 import { createInstance } from '../instances/instance.controller';
 import { createProject, getProjectById } from './../projects/project.model';
 import {
   addNewGroupToRun,
+  addNewJobToRun,
   createRun as storageCreateRun,
   getNewGroupTemplate,
   getRunById,
+  resetFailedSpecs,
   setRunCompleted,
   setSpecClaimed,
   setSpecCompleted,
@@ -53,7 +60,9 @@ export const createRun: ExecutionDriver['createRun'] = async (params) => {
   const groupId = params.group ?? generateGroupId(params.platform, ciBuildId);
 
   const machineId = generateUUID();
-  const enhaceSpecForThisRun = enhanceSpec(groupId);
+  const enhanceSpecForThisRun = enhanceSpec(groupId);
+
+  const isProviderGitlab = params.ci.provider === 'gitlab';
 
   const response: CreateRunResponse = {
     groupId,
@@ -71,9 +80,11 @@ export const createRun: ExecutionDriver['createRun'] = async (params) => {
         getCreateProjectValue(params.projectId, INACTIVITY_TIMEOUT_SECONDS)
       );
     }
-    const specs = params.specs.map(enhaceSpecForThisRun);
+    const specs = params.specs.map(enhanceSpecForThisRun);
 
-    await storageCreateRun({
+    params.commit.remoteOrigin = getRemoteOrigin(params.commit.remoteOrigin);
+
+    const newRun: Run = {
       runId,
       cypressVersion: params.cypressVersion,
       createdAt: new Date().toISOString(),
@@ -92,7 +103,18 @@ export const createRun: ExecutionDriver['createRun'] = async (params) => {
         groups: [getNewGroupTemplate(groupId, specs.length)],
       },
       specs,
-    });
+    };
+    if (isProviderGitlab && GITLAB_JOB_RETRIES == 'true') {
+      newRun.meta.ci = {
+        params: {
+          ...params.ci.params,
+          ciBuildId: params.ci.params?.ciBuildId,
+          ciJobName: [params.ci.params?.ciJobName],
+        },
+        provider: params.ci.provider,
+      };
+    }
+    await storageCreateRun(newRun);
     const timeoutSeconds =
       project?.inactivityTimeoutSeconds ?? INACTIVITY_TIMEOUT_SECONDS;
     await runTimeoutModel.createRunTimeout({
@@ -111,6 +133,20 @@ export const createRun: ExecutionDriver['createRun'] = async (params) => {
       if (!run) {
         throw new Error('No run found');
       }
+
+      if (isProviderGitlab && GITLAB_JOB_RETRIES == 'true') {
+        if (
+          !run.meta.ci.params?.ciJobName.includes(params.ci.params?.ciJobName)
+        ) {
+          // New ci job joining the pool
+          addNewJobToRun(run.runId, params.ci.params?.ciJobName);
+        } else {
+          // Retry job
+          const failedSpecs = getFailedSpecs(run, groupId);
+          await resetFailedSpecs(run, groupId, failedSpecs);
+        }
+      }
+
       const newSpecs = getNewSpecsInGroup({
         run,
         groupId,
@@ -135,7 +171,7 @@ export const createRun: ExecutionDriver['createRun'] = async (params) => {
       await addNewGroupToRun(
         runId,
         groupId,
-        newSpecs.map(enhaceSpecForThisRun)
+        newSpecs.map(enhanceSpecForThisRun)
       );
 
       return response;

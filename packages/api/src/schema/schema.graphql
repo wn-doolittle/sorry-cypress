@@ -10,6 +10,7 @@ type Query {
     cursor: String = null
     filters: [Filters] = null
   ): [Run]!
+  ciBuilds(filters: [Filters] = null): [CiBuild]!
   runFeed(cursor: String, filters: [Filters] = null): RunFeed!
   run(id: ID!): Run
   instance(id: ID!): Instance
@@ -87,6 +88,13 @@ type Run {
   progress: RunProgress
 }
 
+type CiBuild {
+  ciBuildId: String!
+  runs: [Run!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
 type RunCompletion {
   completed: Boolean!
   inactivityTimeoutMs: Int
@@ -104,7 +112,7 @@ type RunSpec {
 
 type RunSpecResults {
   error: String
-  retries: Int
+  flaky: Int
   stats: InstanceStats!
 }
 
@@ -132,7 +140,7 @@ type RunGroupProgressTests {
   failures: Int!
   skipped: Int!
   pending: Int!
-  retries: Int!
+  flaky: Int!
 }
 
 type Commit {

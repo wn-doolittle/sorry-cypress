@@ -9,6 +9,8 @@ type Mutation {
   updateSlackHook(input: UpdateSlackHookInput!): SlackHook!
   createTeamsHook(input: CreateTeamsHookInput!): TeamsHook!
   updateTeamsHook(input: UpdateTeamsHookInput!): TeamsHook!
+  createGChatHook(input: CreateGChatHookInput!): GChatHook!
+  updateGChatHook(input: UpdateGChatHookInput!): GChatHook!
   deleteHook(input: DeleteHookInput!): DeleteHookResponse!
 }
 
@@ -50,8 +52,12 @@ type GithubHook {
   hookId: ID!
   url: String!
   hookType: GithubHookType!
+  githubAuthType: String
   githubToken: String
   githubContext: String
+  githubAppPrivateKey: String
+  githubAppId: String
+  githubAppInstallationId: String
 }
 
 input CreateGithubHookInput {
@@ -62,8 +68,12 @@ input UpdateGithubHookInput {
   projectId: ID!
   hookId: ID!
   url: String!
+  githubAuthType: String
   githubToken: String
   githubContext: String
+  githubAppPrivateKey: String
+  githubAppId: String
+  githubAppInstallationId: String
 }
 
 type BitbucketHook {
@@ -129,13 +139,36 @@ input UpdateGenericHookInput {
   hookEvents: [String!]!
 }
 
+type GChatHook {
+  projectId: ID!
+  hookId: ID!
+  url: String!
+  hookType: GChatHookType!
+  hookEvents: [String!]!
+}
+
+input CreateGChatHookInput {
+  projectId: ID!
+}
+
+input UpdateGChatHookInput {
+  projectId: ID!
+  hookId: ID!
+  url: String!
+  hookEvents: [String!]!
+}
+
 type Hook {
   hookId: String
   url: String
   headers: String
   hookEvents: [String]
   hookType: String
+  githubAuthType: String
   githubToken: String
+  githubAppPrivateKey: String
+  githubAppId: String
+  githubAppInstallationId: String
   githubContext: String
   bitbucketUsername: String
   bitbucketToken: String
@@ -150,7 +183,11 @@ input HookInput {
   headers: String
   hookEvents: [String]
   hookType: String
+  githubAuthType: String
   githubToken: String
+  githubAppPrivateKey: String
+  githubAppId: String
+  githubAppInstallationId: String
   githubContext: String
   bitbucketUsername: String
   bitbucketToken: String
@@ -165,3 +202,4 @@ scalar SlackResultFilter
 scalar GithubHookType
 scalar BitbucketHookType
 scalar TeamsHookType
+scalar GChatHookType

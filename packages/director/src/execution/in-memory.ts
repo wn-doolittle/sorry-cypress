@@ -32,6 +32,7 @@ import {
   getClaimedSpecs,
   getFirstUnclaimedSpec,
   getNewSpecsInGroup,
+  getRemoteOrigin,
   getSpecsForGroup,
 } from './utils';
 
@@ -56,7 +57,7 @@ const createRun: ExecutionDriver['createRun'] = async (
   const machineId = generateUUID();
 
   const groupId = params.group ?? generateGroupId(params.platform, ciBuildId);
-  const enhaceSpecForThisRun = enhanceSpec(groupId);
+  const enhanceSpecForThisRun = enhanceSpec(groupId);
 
   const response: CreateRunResponse = {
     groupId,
@@ -91,7 +92,7 @@ const createRun: ExecutionDriver['createRun'] = async (
 
     runs[runId].specs = [
       ...runs[runId].specs,
-      ...newSpecs.map(enhaceSpecForThisRun),
+      ...newSpecs.map(enhanceSpecForThisRun),
     ];
     return response;
   }
@@ -101,6 +102,8 @@ const createRun: ExecutionDriver['createRun'] = async (
       getCreateProjectValue(params.projectId, INACTIVITY_TIMEOUT_SECONDS)
     );
   }
+
+  params.commit.remoteOrigin = getRemoteOrigin(params.commit.remoteOrigin);
 
   // @ts-ignore
   runs[runId] = {
@@ -117,7 +120,7 @@ const createRun: ExecutionDriver['createRun'] = async (
       platform: params.platform,
       ci: params.ci,
     } as RunMetaData,
-    specs: params.specs.map(enhaceSpecForThisRun),
+    specs: params.specs.map(enhanceSpecForThisRun),
   };
 
   return response;
@@ -159,7 +162,7 @@ const getNextTask: ExecutionDriver['getNextTask'] = async ({
   return {
     projectId: runs[runId].meta.projectId,
     instance: unclaimedSpec,
-    claimedInstances: getClaimedSpecs(runs[runId], groupId).length + 1,
+    claimedInstances: getClaimedSpecs(runs[runId], groupId).length,
     totalInstances: getSpecsForGroup(runs[runId], groupId).length,
   };
 };

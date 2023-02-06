@@ -4,6 +4,7 @@ import { SpecsAPI } from '@sorry-cypress/api/datasources/specs';
 import { AppDatasources } from '@sorry-cypress/api/datasources/types';
 import {
   CreateBitbucketHookInput,
+  CreateGChatHookInput,
   CreateGenericHookInput,
   CreateGithubHookInput,
   CreateProjectInput,
@@ -11,15 +12,17 @@ import {
   CreateTeamsHookInput,
   DeleteHookInput,
   OrderingOptions,
+  RunGroupProgressTests,
   RunSpec,
   UpdateBitbucketHookInput,
+  UpdateGChatHookInput,
   UpdateGenericHookInput,
   UpdateGithubHookInput,
   UpdateProjectInput,
   UpdateSlackHookInput,
   UpdateTeamsHookInput,
 } from '@sorry-cypress/api/generated/graphql';
-import { getTestListRetries, Project } from '@sorry-cypress/common';
+import { Project } from '@sorry-cypress/common';
 import { GraphQLScalarType } from 'graphql';
 import { GraphQLDateTime } from 'graphql-iso-date';
 import { get, identity } from 'lodash';
@@ -51,6 +54,7 @@ export const resolvers = {
   GithubHookType: getStringLiteral('GithubHookType'),
   BitbucketHookType: getStringLiteral('BitbucketHookType'),
   TeamsHookType: getStringLiteral('TeamsHookType'),
+  GChatHookType: getStringLiteral('GChatHookType'),
 
   RunSpec: {
     results: async (
@@ -69,9 +73,11 @@ export const resolvers = {
       }
       return {
         ...response.results,
-        retries: getTestListRetries(response.results?.tests ?? []),
       };
     },
+  },
+  RunGroupProgressTests: {
+    flaky: (parent: RunGroupProgressTests) => parent.flaky ?? 0,
   },
   Query: {
     projects: (
@@ -92,6 +98,13 @@ export const resolvers = {
       { dataSources }: { dataSources: AppDatasources }
     ) => {
       return dataSources.runsAPI.getAllRuns({ orderDirection, filters });
+    },
+    ciBuilds: (
+      _: any,
+      { filters }: Parameters<RunsAPI['getAllCiBuilds']>[0],
+      { dataSources }: { dataSources: AppDatasources }
+    ) => {
+      return dataSources.runsAPI.getAllCiBuilds({ filters });
     },
     runFeed: (
       _: any,
@@ -263,6 +276,12 @@ export const resolvers = {
     ),
     updateTeamsHook: getDatasourceWithInput<UpdateTeamsHookInput>(
       'projectsAPI.updateTeamsHook'
+    ),
+    createGChatHook: getDatasourceWithInput<CreateGChatHookInput>(
+      'projectsAPI.createGChatHook'
+    ),
+    updateGChatHook: getDatasourceWithInput<UpdateGChatHookInput>(
+      'projectsAPI.updateGChatHook'
     ),
     deleteHook: getDatasourceWithInput<DeleteHookInput>(
       'projectsAPI.deleteHook'

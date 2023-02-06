@@ -1,7 +1,8 @@
-import { Search } from '@mui/icons-material';
-import { InputAdornment, TextField, Theme } from '@mui/material';
+import { Clear, Search } from '@mui/icons-material';
+import { IconButton, InputAdornment, TextField, Theme } from '@mui/material';
 import useDebounce from '@sorry-cypress/dashboard/hooks/useDebounce';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 export type OnSearch = (value: string) => unknown;
 
@@ -13,15 +14,38 @@ type SearchFieldProps = {
 
 const SearchField = ({ placeholder, onSearch, disabled }: SearchFieldProps) => {
   const debounce = useDebounce();
-  const [value, setValue] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const value = searchParams.get('search') || '';
+  if (value) {
+    debounce(() => onSearch(value));
+  }
+
+  const setValue = (value: string) => {
+    updateQueryParam(value);
+    debounce(() => onSearch(value));
+  };
+
+  const clearValue = () => {
+    deleteQueryParam();
+    setValue('');
+  };
+
+  const updateQueryParam = (value: string) => {
+    if (value) {
+      setSearchParams({ search: value });
+    } else {
+      deleteQueryParam();
+    }
+  };
+
+  const deleteQueryParam = () => {
+    searchParams.delete('search');
+    setSearchParams(searchParams);
+  };
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-
     setValue(value);
-    debounce(() => {
-      onSearch(value);
-    });
   };
 
   return (
@@ -32,6 +56,17 @@ const SearchField = ({ placeholder, onSearch, disabled }: SearchFieldProps) => {
         startAdornment: (
           <InputAdornment position="start">
             <Search />
+          </InputAdornment>
+        ),
+        endAdornment: (
+          <InputAdornment
+            position="end"
+            style={value ? {} : { display: 'none' }}
+            onClick={clearValue}
+          >
+            <IconButton>
+              <Clear />
+            </IconButton>
           </InputAdornment>
         ),
       }}

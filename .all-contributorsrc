@@ -239,6 +239,7 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/4358455?v=4",
       "profile": "https://www.linkedin.com/in/mathpaquette/",
       "contributions": [
+        "code",
         "doc"
       ]
     },
@@ -322,6 +323,69 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "joaoduartepinto",
+      "name": "joaoduartepinto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/82733395?v=4",
+      "profile": "https://github.com/joaoduartepinto",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "alyssa-glean",
+      "name": "Alyssa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57534485?v=4",
+      "profile": "https://github.com/alyssa-glean",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bjartur20",
+      "name": "Bjartur Þórhallsson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1508187?v=4",
+      "profile": "https://github.com/bjartur20",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "tehKapa",
+      "name": "Matteo Vivona",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6388707?v=4",
+      "profile": "http://matteovivona.it",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "rrauenza",
+      "name": "Rich Rauenzahn",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1376251?v=4",
+      "profile": "https://github.com/rrauenza",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "solidnerd",
+      "name": "Niclas Mietz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/886383?v=4",
+      "profile": "https://solidnerd.dev",
+      "contributions": [
+        "infra"
+      ]
+    },
+    {
+      "login": "Spea",
+      "name": "Martin Parsiegla",
+      "avatar_url": "https://avatars.githubusercontent.com/u/495017?v=4",
+      "profile": "http://speanet.info",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -329,5 +393,6 @@
   "projectOwner": "sorry-cypress",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }

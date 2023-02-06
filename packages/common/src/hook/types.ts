@@ -8,6 +8,7 @@ export enum HookType {
   SLACK_HOOK = 'SLACK_HOOK',
   BITBUCKET_STATUS_HOOK = 'BITBUCKET_STATUS_HOOK',
   TEAMS_HOOK = 'TEAMS_HOOK',
+  GCHAT_HOOK = 'GCHAT_HOOK',
 }
 
 export enum HookEvent {
@@ -45,8 +46,12 @@ export type GenericHook = BaseHook & {
 
 export type GithubHook = BaseHook & {
   hookType: HookType.GITHUB_STATUS_HOOK;
+  githubAuthType?: 'token' | 'app';
   githubToken?: string;
   githubContext?: string;
+  githubAppPrivateKey?: string;
+  githubAppId?: string;
+  githubAppInstallationId?: string;
 };
 
 export type BitBucketHook = BaseHook & {
@@ -61,10 +66,20 @@ export type TeamsHook = BaseHook & {
   hookType: HookType.TEAMS_HOOK;
 };
 
-export type HookWithCustomEvents = SlackHook | TeamsHook | GenericHook;
+export type GChatHook = BaseHook & {
+  hookEvents: HookEvent[];
+  hookType: HookType.GCHAT_HOOK;
+};
+
+export type HookWithCustomEvents =
+  | SlackHook
+  | TeamsHook
+  | GenericHook
+  | GChatHook;
 export type Hook =
   | SlackHook
   | TeamsHook
   | GenericHook
   | GithubHook
-  | BitBucketHook;
+  | BitBucketHook
+  | GChatHook;

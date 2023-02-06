@@ -8,6 +8,10 @@ export const getClaimedSpecs = (run: Run, groupId: string) =>
   getSpecsForGroup(run, groupId).filter((s) => s.claimedAt);
 export const getFirstUnclaimedSpec = (run: Run, groupId: string) =>
   getSpecsForGroup(run, groupId).find((s) => !s.claimedAt);
+export const getFailedSpecs = (run: Run, groupId: string) =>
+  getSpecsForGroup(run, groupId).filter((s) =>
+    s.results ? s.results.stats.failures + s.results.stats.skipped > 0 : false
+  );
 
 interface GetNewSpecsForGroupParams {
   run: Run;
@@ -31,3 +35,14 @@ export const enhanceSpec = (groupId: string) => (spec: string): RunSpec => ({
   completedAt: null,
   groupId,
 });
+
+export const getRemoteOrigin = (
+  remoteOrigin: string | undefined
+): string | undefined => {
+  if (!remoteOrigin) return;
+
+  if (remoteOrigin.includes('@')) {
+    return 'https://' + remoteOrigin.split('@')[1].replace(':', '/');
+  }
+  return remoteOrigin;
+};

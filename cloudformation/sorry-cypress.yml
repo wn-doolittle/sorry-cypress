@@ -427,6 +427,8 @@ Resources:
               Value: ../execution/mongo/driver
             - Name: SCREENSHOTS_DRIVER
               Value: ../screenshots/s3.driver
+            - Name: GITLAB_JOB_RETRIES
+              Value: false
             - Name: MONGODB_DATABASE
               Value: sorry-cypress
             - Name: MONGODB_URI
@@ -435,6 +437,8 @@ Resources:
               Value: !Join ['-', [!Ref 'AWS::StackName', 'test-results']]
             - Name: S3_REGION
               Value: !Ref 'AWS::Region'
+            - Name: PROBE_LOGGER
+              Value: "false"
           DependsOn:
             - ContainerName: mongo
               Condition: START
@@ -454,6 +458,8 @@ Resources:
               Value: sorry-cypress
             - Name: MONGODB_URI
               Value: mongodb://sorry-cypress:sorry-cypress@127.0.0.1:27017
+            - Name: APOLLO_PLAYGROUND
+              Value: false
           DependsOn:
             - ContainerName: director
               Condition: START

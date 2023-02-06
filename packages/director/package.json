@@ -1,6 +1,6 @@
 {
   "name": "@sorry-cypress/director",
-  "version": "2.1.4",
+  "version": "2.5.1",
   "author": {
     "name": "Andrew Goldis",
     "email": "agoldis@gmail.com"
@@ -26,6 +26,10 @@
     "release": "yarn version --no-git-tag-version"
   },
   "dependencies": {
+    "@azure/identity": "^2.0.5",
+    "@azure/storage-blob": "^12.10.0",
+    "@octokit/auth-app": "^4.0.7",
+    "@octokit/rest": "^19.0.5",
     "@sorry-cypress/common": "1.0.0",
     "@sorry-cypress/logger": "1.0.0",
     "@sorry-cypress/mongo": "1.0.0",
@@ -54,6 +58,7 @@
     "@babel/preset-typescript": "^7.10.4",
     "@types/clone-deep": "^4.0.1",
     "@types/express": "^4.17.12",
+    "@types/jest": "^27.4.7",
     "@types/lodash": "^4.14.149",
     "@types/md5": "^2.1.33",
     "@types/minio": "^7.0.13",
